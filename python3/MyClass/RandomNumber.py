@@ -4,20 +4,20 @@
 # ProgramName: RandomNumber
 
 
-
 import random
 import os
-import sys
+numpyStatus = True
+pltStatus = True
 try:
-    import matplotlib.pyplot as plt
-except:
-    pass
+    import matplotlib.pyplot as plt         # 尝试引入matplotlib.pyplot
+except ModuleNotFoundError:
+    pltStatus = False               # 如果引入失败则让pltStatus的值为false
 try:
-    import numpy
-except:
-    pass
-sys.path.append("..")
-from MyClass.JsonManager import jsonManager as JsonM
+    import numpy                    # 尝试引入numpy
+except ModuleNotFoundError:
+    numpyStatus = False             # 如果引入失败则让numpyStatus的值为false
+from MyClass.JsonManager import jsonManager as JsonM    # 引入Myclass的JsonManager模块
+
 
 class randomNumber:
     """
@@ -123,8 +123,12 @@ class randomNumber:
         :return:无返回值
         """
         self.backDoorJsonReader()
-        if self.randomStatus:       # 检测是否达成运行条件
-            pass
+        if self.randomStatus:       # 检测是否达成循环运行条件
+            if numpyStatus:         # 检测是否成功引入了numpy
+                pass
+            else:
+                print("未成功引用Numpy模块，已使用内置备用随机数生成器")     # 弹出提示
+                self.random()           # 运行内置random的随机数生成器
         else:               # 不达到就强制退出
             return
         count = 1			# 设置计数器，这个是为了计算生成了几个数
@@ -146,24 +150,35 @@ class randomNumber:
             count = count + 1				# count计数器加1
 
     def reNumberDictViewer(self):
-        plt.rcParams['font.sans-serif'] = ['SimHei']    # 用来正常显示中文标签
-        x = numpy.array(list(self.reNumberDict.keys()))
-        y = numpy.array(list(self.reNumberDict.values()))
-        count = 1
-        xy = []
-        while (count < len(x)):
+        if numpyStatus:         # 检测是否成功引入了numpy
+            if pltStatus:           # 检测是否成功引入了matplotlib.pyplot
+                pass
+            else:
+                print("未成功引入matplotlib绘图模块，未完成绘图功能")
+                return
+        else:
+            print("为成功引入Numpy模块，未完成绘图功能")
+            return
+
+        plt.rcParams['font.sans-serif'] = ['SimHei']        # 用来正常显示中文
+        x = numpy.array(list(self.reNumberDict.keys()))     # 把self.reNumberDict的 键 依次存入有序列表 x 中
+        y = numpy.array(list(self.reNumberDict.values()))       # 把self.reNumberDict的 值 依次存入有序列表 y 中
+        count = 1           # 定义一个循环控制器
+        xy = []             # 定义一个装有 数据柱 标注 的坐标的list
+        while (count < len(x)):         # 用循环将x和y的值，一一对应的放入temp，然后装到xy中
             temp = []
             temp.append(x[count - 1])
             temp.append(y[count - 1])
             xy.append(temp)
-            count = count + 1
+            count = count + 1           # 计数器自加一
         title = str(self.minLim) + " 号到 " + str(self.maxLim) + " 号的共 " + str(self.Num) + " 次随机抽取情况"
-        plt.figure(title, figsize=(self.maxLim / 2, 4))
-        plt.title(title)  # 标题
-        plt.bar(x, y, 0.2, alpha=1, color='r')
-        plt.xticks(numpy.arange(self.minLim, self.maxLim + 1, 1))
-        plt.yticks(numpy.arange(1, self.reLimit + 1, 1))
+            # 动态赋值title的内容
+        plt.figure(title, figsize=(self.maxLim / 2, 4))     # 设置figure的宽度和高度，以及figure的标题
+        plt.title(title)  # 设置图表的标题
+        plt.bar(x, y, 0.5, alpha=1, color='b')         # 设置柱状图的x，y信息，柱子的宽度，透明度，颜色
+        plt.xticks(numpy.arange(self.minLim, self.maxLim + 1, 1))       # 设置x轴显示的信息
+        plt.yticks(numpy.arange(1, self.reLimit + 1, 1))                # 设置y轴显示的信息
         for i in xy:
-            plt.annotate("%s" % i[1], xy=i, xytext=(i[0] - 0.1, i[1] + 0.05))
+            plt.annotate("%s" % i[1], xy=i, xytext=(i[0] - 0.1, i[1] + 0.025))       # 用循环，依次标记柱状图的柱子的值
         plt.show()
 
