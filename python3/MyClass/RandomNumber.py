@@ -29,7 +29,7 @@ class randomNumber:
         self.maxLim = maxLim			# 随机数的最大值（包含）
         self.Num = Num					# 生成随机数的个数
         self.reLimit = reLimit			# 每个数的生成次数上限，默认值为 0，表示不限次数
-        self.backDoor = False			# backdoor开关
+        self.backDoor = backDoor	    # backdoor开关
 
         self.backDoorList = []			# backDoor列表
         self.randomNumberlist = []		# 生成的随机数的list
@@ -37,9 +37,6 @@ class randomNumber:
         self.randomStatus = True       # random()运行标识符
         self.backDoorJsonPath = backDoorJsonPath        # backDoorJson的path
 
-        if (maxLim - minLim + 1) * reLimit < Num:
-            self.randomStatus = False       # 改变random()运行运行标识符为False
-            print("Init_Error: 初始化错误，请保证 最大可能数字出现总次数 大于 您所需要随机数个数！！！！")
         if backDoor == True:			# 如果backdoor是打开的
             self.backDoor = backDoor		# 则设置类内backDoor开关为打开
             if os.path.exists(backDoorJsonPath):		# 检查是否存在backDoorJsonPath文件
@@ -48,17 +45,22 @@ class randomNumber:
                 self.backDoor = False
         else:
             pass
+        if (((maxLim - minLim) - self.backDoorJsonReader()) + 1) * reLimit < Num:
+            self.randomStatus = False       # 改变random()运行运行标识符为False
+            print("Init_Error: 初始化错误，请保证 最大可能数字出现总次数 大于 您所需要随机数个数！！！！")
+
 
     def backDoorJsonReader(self):
         """
         读取backDoorJson的数据，并赋值给self.backDoorList
-        :return:无返回值
+        :return:返回self.backDoorList的长度
         """
         if self.backDoor:				# 如果backDoor开关为打开的，则将json文件内容(list)读取到self.backDoorList
             jsonManager = JsonM(self.backDoorJsonPath)
             self.backDoorList = jsonManager.readerContent
+            return len(self.backDoorList)          # 返回self.backDoorList的长度
         else:
-            pass
+            return 0
 
     def backDoorJsonWriter(self, inBackDoorList):
         """
@@ -78,7 +80,7 @@ class randomNumber:
     def randomCount(self):
         """
         生成随机数的次数统计，并写入到reNumberDict.json
-        :return:
+        :return:无返回值
         """
         if os.path.exists("reNumberDict.json"):            # 如果存在backDoorJsonPath文件
             jsonManager = JsonM("reNumberDict.json")          # 实例化JsonM，初始化里会读取backDoorJsonPath文件的json
@@ -124,6 +126,7 @@ class randomNumber:
         """
         self.backDoorJsonReader()
         if self.randomStatus:       # 检测是否达成循环运行条件
+            print("成功")
             if numpyStatus:         # 检测是否成功引入了numpy
                 pass
             else:
@@ -156,7 +159,11 @@ class randomNumber:
         """
         if numpyStatus:         # 检测是否成功引入了numpy
             if pltStatus:           # 检测是否成功引入了matplotlib.pyplot
-                pass
+                if len(self.randomNumberlist) == 0 or len(self.randomNumberlist) != self.Num:
+                    # 如果self.randomNumberlist 为空，或者长度不为需求所需，则不运行
+                    return
+                else:
+                    pass
             else:
                 print("未成功引入matplotlib绘图模块，未完成绘图功能")
                 return
@@ -178,7 +185,7 @@ class randomNumber:
         title = str(self.minLim) + " 号到 " + str(self.maxLim) + " 号的共 " + str(self.Num) + " 次随机抽取情况"
             # 动态赋值title的内容
         plt.figure(title, figsize=(self.maxLim / 2, 4))     # 设置figure的宽度和高度，以及figure的标题
-        plt.title(title)  # 设置图表的标题
+        plt.title(title)        # 设置图表的标题
         plt.bar(x, y, 0.5, alpha=1, color='b')         # 设置柱状图的x，y信息，柱子的宽度，透明度，颜色
         plt.xticks(numpy.arange(self.minLim, self.maxLim + 1, 1))       # 设置x轴显示的信息
         plt.yticks(numpy.arange(1, self.reLimit + 1, 1))                # 设置y轴显示的信息
