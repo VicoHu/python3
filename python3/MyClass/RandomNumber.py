@@ -150,6 +150,10 @@ class randomNumber:
             count = count + 1				# count计数器加1
 
     def reNumberDictViewer(self):
+        """
+        用numpy和matplotlib.pyplot对reNumberDict(数字的重复次数统计),并绘制二维柱状图
+        :return: 无返回值
+        """
         if numpyStatus:         # 检测是否成功引入了numpy
             if pltStatus:           # 检测是否成功引入了matplotlib.pyplot
                 pass
