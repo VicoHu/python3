@@ -45,7 +45,8 @@ class randomNumber:
                 self.backDoor = False
         else:
             pass
-        if (((maxLim - minLim) - self.backDoorJsonReader()) + 1) * reLimit < Num:
+        if (((maxLim - minLim) - self.backDoorJsonReader()) + 1) * reLimit < Num and reLimit != 0:
+                    # 如果无法生成Num个随机数(重复次数范围内)，并且，reLimit不为0(为0时表示无重复上限)
             self.randomStatus = False       # 改变random()运行运行标识符为False
             print("Init_Error: 初始化错误，请保证 最大可能数字出现总次数 大于 您所需要随机数个数！！！！")
 
@@ -109,11 +110,11 @@ class randomNumber:
                 pass
             if RandNum in self.reNumberDict.keys():			# 如果随机数在重复字典的键中存在
                 if self.reNumberDict[RandNum] == self.reLimit:       # 如果该键出现次数等于reLimit(重复最大次数)，则放弃该值
+                    # 该处由于self.reNumberDict[RandNum]最小值为1，所以,reLimit为0时，表示数字不受上限限制
                     continue
                 else:
                     self.reNumberDict[RandNum] = self.reNumberDict[RandNum] + 1     # 如果以上条件都满足，则给该键的值加1，表示出现次数加1
             else:					# 如果该随机数没有在重复字典的键中出现过，则添加该键，并给其值为1，表示该键出现一次
-
                 self.reNumberDict[RandNum] = 1
             self.randomNumberlist.append(RandNum)  # 将一个随机数加入到randomNumberList
             count = count + 1				# count计数器加1
@@ -143,11 +144,11 @@ class randomNumber:
                 pass
             if RandNum.tolist()[0] in self.reNumberDict.keys():			# 如果随机数在重复字典的键中存在
                 if self.reNumberDict[RandNum.tolist()[0]] == self.reLimit:       # 如果该键出现次数等于reLimit(重复最大次数)，则放弃该值
+                    # 该处由于self.reNumberDict[RandNum.tolist()[0]]最小值为1，所以,reLimit为0时，表示数字不受上限限制
                     continue
                 else:
                     self.reNumberDict[RandNum.tolist()[0]] = self.reNumberDict[RandNum] + 1     # 如果以上条件都满足，则给该键的值加1，表示出现次数加1
             else:					# 如果该随机数没有在重复字典的键中出现过，则添加该键，并给其值为1，表示该键出现一次
-
                 self.reNumberDict[RandNum.tolist()[0]] = 1
             self.randomNumberlist.append(RandNum.tolist()[0])  # 将一个随机数加入到randomNumberList
             count = count + 1				# count计数器加1
@@ -170,13 +171,12 @@ class randomNumber:
         else:
             print("为成功引入Numpy模块，未完成绘图功能")
             return
-
         plt.rcParams['font.sans-serif'] = ['SimHei']        # 用来正常显示中文
         x = numpy.array(list(self.reNumberDict.keys()))     # 把self.reNumberDict的 键 依次存入有序列表 x 中
         y = numpy.array(list(self.reNumberDict.values()))       # 把self.reNumberDict的 值 依次存入有序列表 y 中
         count = 1           # 定义一个循环控制器
         xy = []             # 定义一个装有 数据柱 标注 的坐标的list
-        while (count < len(x)):         # 用循环将x和y的值，一一对应的放入temp，然后装到xy中
+        while (count <= len(x)):         # 用循环将x和y的值，一一对应的放入temp，然后装到xy中
             temp = []
             temp.append(x[count - 1])
             temp.append(y[count - 1])
@@ -188,8 +188,11 @@ class randomNumber:
         plt.title(title)        # 设置图表的标题
         plt.bar(x, y, 0.5, alpha=1, color='b')         # 设置柱状图的x，y信息，柱子的宽度，透明度，颜色
         plt.xticks(numpy.arange(self.minLim, self.maxLim + 1, 1))       # 设置x轴显示的信息
-        plt.yticks(numpy.arange(1, self.reLimit + 1, 1))                # 设置y轴显示的信息
+        if self.reLimit != 0:
+            plt.yticks(numpy.arange(1, self.reLimit + 1, 1))                # 设置y轴显示的信息
+        else:
+            valuesMax = numpy.sort(list(self.reNumberDict.values()))        # 得到最大的self.reNumberDict的值中最大的值
+            plt.yticks(numpy.arange(1, valuesMax[-1] + 1, 1))                # 设置y轴显示的信息
         for i in xy:
-            plt.annotate("%s" % i[1], xy=i, xytext=(i[0] - 0.1, i[1] + 0.025))       # 用循环，依次标记柱状图的柱子的值
+            plt.annotate("%s" % i[1], xy=i, xytext=(i[0] - 0.17, i[1] + 0.04), color="r")       # 用循环，依次标记柱状图的柱子的值
         plt.show()
-
