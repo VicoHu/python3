@@ -1,4 +1,4 @@
-# -- coding: utf-8 --
+﻿# -- coding: utf-8 --
 # Author: VicoHu
 # Date: 2019.4.3
 # ProgramName: RandomNumber
@@ -6,8 +6,8 @@
 
 import random
 import os
-numpyStatus = True
-pltStatus = True
+numpyStatus = True	# 设置numpy库引入标识
+pltStatus = True		# 设置plt库引入标识
 try:
     import matplotlib.pyplot as plt         # 尝试引入matplotlib.pyplot
 except ModuleNotFoundError:
